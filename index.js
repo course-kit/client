@@ -1,5 +1,3 @@
-// https://github.com/apivideo/api.video-player-sdk/blob/master/index.ts
-
 import { PlayerSdk } from '@api.video/player-sdk'
 
 class VideoLoader {

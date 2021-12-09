@@ -1,5 +1,23 @@
 {
+  "name": "@coursekit/client",
+  "description": "",
+  "version": "0.0.1",
+  "module": "index.js",
   "dependencies": {
     "@api.video/player-sdk": "^1.2.9"
-  }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/course-kit/client.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/course-kit/client/issues"
+  },
+  "homepage": "https://github.com/course-kit/client#readme"
 }
