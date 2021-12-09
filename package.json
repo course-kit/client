@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@api.video/player-sdk": "^1.2.9"
+  }
+}
