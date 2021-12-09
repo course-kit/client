@@ -1,5 +1,8 @@
 # CourseKit Client
 
+[![Node version](https://img.shields.io/node/v/@coursekit/client.svg?style=flat)](http://nodejs.org/download/)
+
+
 ## Live demo
 
 [https://coursekit-nuxt-demo.netlify.app/](https://coursekit-nuxt-demo.netlify.app/)
