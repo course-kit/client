@@ -1,13 +1,12 @@
 {
   "name": "@coursekit/client",
-  "description": "",
+  "description": "CourseKit client library",
   "version": "0.0.1",
-  "module": "index.js",
-  "dependencies": {
-    "@api.video/player-sdk": "^1.2.9"
-  },
+  "main": "dist/library.js",
+  "module": "dist/library.mjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rollup -c",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -19,5 +18,11 @@
   "bugs": {
     "url": "https://github.com/course-kit/client/issues"
   },
-  "homepage": "https://github.com/course-kit/client#readme"
+  "homepage": "https://github.com/course-kit/client#readme",
+  "devDependencies": {
+    "@api.video/player-sdk": "^1.2.9",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.0.6",
+    "rollup": "^2.60.2"
+  }
 }
