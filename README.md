@@ -10,7 +10,7 @@ This repo is for the CourseKit JavaScript Client which provides an easy way to a
 
 NPM:
 
-```
+```bash
 npm install --save @coursekit/client
 ```
 
@@ -108,8 +108,39 @@ The constructor takes three parameters:
 
 ## Content object
 
-# Other resources
+## Examples
+
+### UserLoader
+
+This code will load the user from API and should be run ASAP.
+
+```javascript
+const { UserLoader } = require('@coursekit/client')
+const userLoader = new UserLoader(opts)
+const { user } = await userLoader.loadUser()
+```
+
+#### Log in/out button
+
+Put an HTML button somewhere on your page (e.g. in the nav bar) where a user can log in or out.
+
+```javascript
+const button = document.querySelector('#login-button')
+if (user.isAuthenticated()) {
+  button.innerText = 'Log out'
+  button.addEventListener('click', user.logout({ schoolId }))
+} else {
+  button.innerText = 'Log in'
+  button.addEventListener('click', user.login({ schoolId }))
+}
+```
+
+### Content
+
+### Video
+
+## Resources
 
 - [CourseKit](https://coursekit.dev)
-- [CourseKit demo](https://coursekit-nuxt-demo.netlify.app/)
+- [CourseKit Nuxt demo](https://github.com/course-kit/nuxt-demo)
 - [Getting Started guide](https://github.com/course-kit/guides/blob/master/getting-started.md)
