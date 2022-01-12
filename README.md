@@ -110,6 +110,20 @@ The constructor takes three parameters:
 
 ## Examples
 
+### Accessing resource IDs
+
+Note that you'll need to be able to access the school ID, course IDs, and lesson IDs in your app so that you can request the relevant resources. These are all public values so feel free to hardcode these. 
+
+One strategy that's effective for static sites and single page apps is to hardcode the school ID directly in your code, e.g. `const schoolId = 'scx7fdv32m'`, and generate page routes with the course and lesson IDs as dynamic segments.
+
+For example, your lesson page may be `/courses/:courseid/lessons/:lessonid`. Now, it's trivial to retrieve the course ID and lesson IDs at runtime.
+
+```javascript
+const segments = window.location.pathname.split('/')
+const courseId = segments[segments.length - 3]
+const lessonId = segments[segments.length - 1]
+```
+
 ### UserLoader
 
 This code will load the user from API and should be run ASAP.
@@ -132,6 +146,23 @@ if (user.isAuthenticated()) {
 } else {
   button.innerText = 'Log in'
   button.addEventListener('click', user.login({ schoolId }))
+}
+```
+
+#### 'Complete lesson and continue' button
+
+On your lesson page you probably would include a button that will allow the user to simultaneously mark the current lesson complete and progress to the next one.
+
+```javascript
+const button = document.querySelector('#complete-button')
+if (user.isAuthenticated()) {
+  button.addEventListener('click', async () => {
+    const success = await user.markComplete(courseId, lessonId)
+    if (success) {
+      const nextLessonId = await user.getNextLessonId(courseId)
+      window.location.href = `/courses/${courseId}/lessons/${nextLessonId}`
+    }
+  })
 }
 ```
 
