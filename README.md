@@ -57,25 +57,64 @@ Loads the user's data from the API. Returns a `User` object which provides the d
 
 ### Methods
 
-#### `isAuthenticated()`
+#### `login(opts: object): void`
 
-#### `getName()`
+Redirects the user to the login form. Note that you must supply an options object with either a `courseId` value or a `schoolId` value. This value will be used to determine where the user is redirected after login. If both values are provided, the `courseId` will be used.
 
-#### `login(opts)`
+Example:
 
-#### `logout(opts)`
+```javascript
+// Redirects to login form then to homepage of school
+user.login({ schoolId: 'sc8gn2pl' })
+```
 
-#### `markComplete(courseId, lessonId)`
+| Option name | Required? | Type | Description |
+|-|-|-|-|
+| courseId | no | string | The ID of the course that the user should be redirected to after login.  |
+| courseId | no | string | The ID of the school that the user should be redirected to after login.  |
 
-#### `markIncomplete(courseId, lessonId)`
+#### `logout(opts: object): void`
 
-#### `isLessonComplete(courseId, lessonId)`
+Logs out the user. Note that you must supply an options object with either a `courseId` value or a `schoolId` value. This value will be used to determine where the user is redirected after logout. If both values are provided, the `courseId` will be used.
 
-#### `isCourseEnrolled(courseId, lessonId)`
+| Option name | Required? | Type | Description |
+|-|-|-|-|
+| courseId | no | string | The ID of the course that the user should be redirected to after logout.  |
+| courseId | no | string | The ID of the school that the user should be redirected to after logout.  |
 
-#### `getNextLessonId(courseId)`
+#### `isAuthenticated(): boolean`
 
-#### `getProgress(courseId)`
+Returns a boolean indicating whether or not the user is logged in.
+
+#### `getName(): string`
+
+Returns the user's name as a string.
+
+#### `markComplete(courseId: string, lessonId: string): Promise<boolean>`
+
+Asynchronous method that marks a specified lesson of a course as complete.
+
+#### `markIncomplete(courseId: string, lessonId: string): Promise<boolean>`
+
+Asynchronous method that marks a specified lesson of a course as incomplete.
+
+#### `isLessonComplete(courseId: string, lessonId: string): boolean`
+
+Returns a boolean indiciating whether or not a user has marked a specified lesson of a course as complete.
+
+#### `isCourseEnrolled(courseId: string): boolean`
+
+Returns a boolean indicating whether or not a user is enrolled in a specified course.
+
+#### `getNextLessonId(courseId: string): string`
+
+Returns the lesson ID of the next incomplete lesson of a specified course.
+
+#### `getProgress(courseId: string): float`
+
+Returns a number between 0 and 1 with decimal points indicating the amount of the specified course that is complete.
+
+For example, in a 4 lesson course if 1 lesson is complete this method would return `0.25`.
 
 ## LessonLoader class
 
@@ -108,7 +147,7 @@ The constructor takes three parameters:
 
 ## Content object
 
-## Examples
+## Usage tips and examples
 
 ### Accessing resource IDs
 
@@ -149,7 +188,7 @@ if (user.isAuthenticated()) {
 }
 ```
 
-#### 'Complete lesson and continue' button
+#### "Complete lesson and continue" button
 
 On your lesson page you probably would include a button that will allow the user to simultaneously mark the current lesson complete and progress to the next one.
 
