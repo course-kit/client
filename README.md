@@ -32,15 +32,81 @@ const { LessonLoader, UserLoader } = require('@coursekit/client')
 
 The `UserLoader` class provides easy access to the CourseKit User API.
 
+```javascript
+const { UserLoader } = require('@coursekit/client')
+const userLoader = new UserLoader()
+```
+
+### Constructor
+
+The constructor takes one parameter:
+
+- `options : object`. An optional object with the following options:
+
 | Option name | Required? | Type | Description |
 |-|-|-|-|
 | baseUrl | no | string | Changes the URL of the CourseKit API. |
 
 ### Methods
 
+#### `loadUser() : Promise<User>`
 
+Loads the user's data from the API. Returns a `User` object which provides the data and methods you need to manage the user.
+
+## User object
+
+### Methods
+
+#### `isAuthenticated()`
+
+#### `getName()`
+
+#### `login(opts)`
+
+#### `logout(opts)`
+
+#### `markComplete(courseId, lessonId)`
+
+#### `markIncomplete(courseId, lessonId)`
+
+#### `isLessonComplete(courseId, lessonId)`
+
+#### `isCourseEnrolled(courseId, lessonId)`
+
+#### `getNextLessonId(courseId)`
+
+#### `getProgress(courseId)`
 
 ## LessonLoader class
+
+The `LessonLoader` class provides easy access to the CourseKit Lesson API.
+
+```javascript
+const { LessonLoader } = require('@coursekit/client')
+const lessonLoader = new LessonLoader(course.id, lesson.id)
+```
+
+### Constructor
+
+The constructor takes three parameters:
+
+- `courseId : string`.
+- `lessonId : string`.
+- `options : object`. An optional object with the following options:
+
+| Option name | Required? | Type | Description |
+|-|-|-|-|
+| baseUrl | no | string | Changes the URL of the CourseKit API. |
+
+### Methods
+
+#### `loadPlayer(targetSelector : string, playerOptions : object) : Promise<Player>`
+
+#### `loadContent() : Promise<Content>`
+
+## Player object
+
+## Content object
 
 # Other resources
 
