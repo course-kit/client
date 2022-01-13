@@ -53,7 +53,7 @@ The constructor takes one parameter:
 
 Loads the user's data from the API. The return object properties are:
 
-- `status: number`. The status of API call to load the user.
+- `status: number`. The status of the API call to load the user.
 
 | Status | Description |
 |-|-|
@@ -127,7 +127,7 @@ Asynchronous method that marks a specified lesson of a course as incomplete. Ret
 
 #### `isLessonComplete(courseId: string, lessonId: string): boolean | null`
 
-Returns a boolean indiciating whether or not a user has marked a specified lesson of a course as complete. Returns null if user is not logged in.
+Returns a boolean indicating whether or not a user has marked a specified lesson of a course as complete. Returns null if user is not logged in.
 
 #### `isCourseEnrolled(courseId: string): boolean | null`
 
@@ -168,7 +168,7 @@ The constructor takes three parameters:
 
 #### `loadPlayer(targetSelector: string, opts?: object) : Promise<object>`
 
-In order to display your lesson video in your site the `loadPlayer` method will embed an HTML5 video player into your page. It also returns a `Player` object which provides method and events that allow your site to interface programmatically with the player.
+To display your lesson video on your site, the `loadPlayer` method will embed an HTML5 video player into your page. It also returns a `Player` object which provides methods and events that allow your site to interface programmatically with the player.
 
 You will need to elect a "mount element" in your page where the player will be dynamically embedded. e.g.
 
@@ -200,7 +200,7 @@ The return object properties are:
 | 500 | Error |
 
 
-- `player: Player | null`. An instance of the `Player` object which provides methods and events allowing you to control the video player with JavaScript. Note that the player will be `null` if the status is not `200`.
+- `player: Player | null`. An instance of the `Player` object that provides methods and events allowing you to control the video player with JavaScript. Note that the player will be `null` if the status is not `200`.
 
 Example:
 
@@ -257,7 +257,7 @@ Since the `Player` object is an instance of the of the api.video PlayerSDK, you 
 
 Note that you'll need to be able to access the school ID, course IDs, and lesson IDs in your app so that you can request the relevant resources. These are all public values so feel free to hardcode these. 
 
-One strategy that's effective for static sites and single page apps is to hardcode the school ID directly in your code, e.g. `const schoolId = 'scx7fdv32m'`, and generate page routes with the course and lesson IDs as dynamic segments.
+One strategy that's effective for static sites and single-page apps is to hardcode the school ID directly in your code, e.g. `const schoolId = 'scx7fdv32m'`, and generate page routes with the course and lesson IDs as dynamic segments.
 
 For example, your lesson page may be `/courses/:courseid/lessons/:lessonid`. Now, it's trivial to retrieve the course ID and lesson IDs at runtime.
 
@@ -311,8 +311,7 @@ if (user.isAuthenticated()) {
 
 ### Loading lesson content
 
-...
-
+If you want to include private text-based content in your course you may want use a markdown string. You can load it from the API and convert to HTML using a library like [MarkdownIt](https://github.com/markdown-it/markdown-it). Once that's done you can add it to the page.
 
 ```javascript
 const { LessonLoader } = require('@coursekit/client')
