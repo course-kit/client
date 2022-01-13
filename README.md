@@ -4,7 +4,7 @@
 
 [CourseKit](https://coursekit.dev/) is the easiest way to create a full-featured, custom online course, exactly how you want it. Use your favorite frontend tools - no server required!
 
-This repo is for the CourseKit JavaScript Client which provides an easy way to access the CourseKit API.
+This repo is for the *CourseKit JavaScript Client* which provides an easy way to access the features of the CourseKit API.
 
 ## Installation
 
@@ -28,9 +28,9 @@ CJS:
 const { LessonLoader, UserLoader } = require('@coursekit/client')
 ```
 
-## UserLoader class
+## UserLoader
 
-The `UserLoader` class provides easy access to the CourseKit User API.
+The `UserLoader` class is used to create a `User` object.
 
 ```javascript
 const { UserLoader } = require('@coursekit/client')
@@ -41,7 +41,7 @@ const userLoader = new UserLoader()
 
 The constructor takes one parameter:
 
-- `options : object`. An optional object with the following options:
+- `options: object`. An optional object with the following options:
 
 | Option name | Required? | Type | Description |
 |-|-|-|-|
@@ -49,11 +49,13 @@ The constructor takes one parameter:
 
 ### Methods
 
-#### `loadUser() : Promise<User>`
+#### `loadUser(): Promise<User>`
 
 Loads the user's data from the API. Returns a `User` object which provides the data and methods you need to manage the user.
 
-## User object
+## User
+
+The `User` object, returned from the `loadUser` method of `UserLoader`, provides an easy way to manage the user from the client.
 
 ### Methods
 
@@ -71,7 +73,7 @@ user.login({ schoolId: 'sc8gn2pl' })
 | Option name | Required? | Type | Description |
 |-|-|-|-|
 | courseId | no | string | The ID of the course that the user should be redirected to after login.  |
-| courseId | no | string | The ID of the school that the user should be redirected to after login.  |
+| schoolId | no | string | The ID of the school that the user should be redirected to after login.  |
 
 #### `logout(opts: object): void`
 
@@ -80,7 +82,7 @@ Logs out the user. Note that you must supply an options object with either a `co
 | Option name | Required? | Type | Description |
 |-|-|-|-|
 | courseId | no | string | The ID of the course that the user should be redirected to after logout.  |
-| courseId | no | string | The ID of the school that the user should be redirected to after logout.  |
+| schoolId | no | string | The ID of the school that the user should be redirected to after logout.  |
 
 #### `isAuthenticated(): boolean`
 
@@ -116,22 +118,22 @@ Returns a number between 0 and 1 with decimal points indicating the amount of th
 
 For example, in a 4 lesson course if 1 lesson is complete this method would return `0.25`.
 
-## LessonLoader class
+## LessonLoader
 
-The `LessonLoader` class provides easy access to the CourseKit Lesson API.
+The `LessonLoader` class is used to load lesson content.
 
 ```javascript
 const { LessonLoader } = require('@coursekit/client')
-const lessonLoader = new LessonLoader(course.id, lesson.id)
+const lessonLoader = new LessonLoader(courseId, lessonId)
 ```
 
 ### Constructor
 
 The constructor takes three parameters:
 
-- `courseId : string`.
-- `lessonId : string`.
-- `options : object`. An optional object with the following options:
+- `courseId: string`. The ID of the course.
+- `lessonId: string`. The ID of the lesson.
+- `options: object`. An optional object with the following options:
 
 | Option name | Required? | Type | Description |
 |-|-|-|-|
@@ -139,13 +141,66 @@ The constructor takes three parameters:
 
 ### Methods
 
-#### `loadPlayer(targetSelector : string, playerOptions : object) : Promise<Player>`
+#### `loadPlayer(targetSelector: string, opts: object) : Promise<object>`
+
+In order to display your lesson video in your site the `loadPlayer` method will embed an HTML5 video player into your page. It also returns a `Player` object which provides method and events that allow your site to interface programmatically with the player.
+
+You will need to elect a "mount element" in your page where the player will be dynamically embedded. e.g.
+
+```html
+<!--Mount element where video player will be embedded-->
+<div id="video"></div>
+```
+
+The parameters are:
+
+- `targetSelector: string | Element` a CSS selector targeting the DOM element in which you want to create the player (eg. "#target"), or the DOM element itself
+- `opts: object`. an object containing the player options. The available options are the following:
+
+| Option name | Required? | Type | Description |
+|-|-|-|-|
+| courseId | no | string | The ID of the course that the user should be redirected to after login.  |
+| schoolId | no | string | The ID of the school that the user should be redirected to after login.  |
+
+The return object properties are:
+
+- `status: number`. The status of API call to load the lesson's video.
+
+| Status | Description |
+|-|-|
+| 200 | Successfully loaded |
+| 401 | User is not authenticated |
+| 403 | User is authenticated but does not have access to this lesson |
+| 500 | Error |
+
+
+- `player: Player`. An instance of the `Player` object which provides methods and events allowing you to control the video player with JavaScript. Note that the player will be `null` if the status is not `200`.
+
+Example:
+
+```javascript
+const { status, player } = await lessonLoader.loadPlayer('#video')
+
+if (status !== 200) {
+  // player === null
+} else {
+  player.addEventListener('play', console.log('Video is playing!'))
+}
+```
 
 #### `loadContent() : Promise<Content>`
 
-## Player object
 
-## Content object
+
+## Player
+
+This object is returned from the `loadPlayer` method of the `LessonLoader`. The object is an instance of the [api.video PlayerSDK class](https://github.com/apivideo/api.video-player-sdk#documentation).
+
+### Methods and events
+
+Since the `Player` object is an instance of the of the api.video PlayerSDK, you should check the [documentation of the PlayerSDK methods](https://github.com/apivideo/api.video-player-sdk/blob/master/README.md#methods) for information about methods and events.
+
+## Content
 
 ## Usage tips and examples
 
