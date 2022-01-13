@@ -14,27 +14,27 @@ NPM:
 npm install --save @coursekit/client
 ```
 
-There are two classes you can use from this library, `LessonLoader` and `UserLoader`. Both an ES Modules and CommonJS build are provided.
+There are two classes you can use from this library, `Lesson` and `User`. Both an ES Modules and CommonJS build are provided.
 
 ESM:
 
 ```javascript
-import { LessonLoader, UserLoader } from '@coursekit/client'
+import { Lesson, User } from '@coursekit/client'
 ```
 
 CJS:
 
 ```javascript
-const { LessonLoader, UserLoader } = require('@coursekit/client')
+const { Lesson, User } = require('@coursekit/client')
 ```
 
-## UserLoader
+## User class
 
-The `UserLoader` class is used to create a `User` object.
+The `User` class is used to create a `User` object.
 
 ```javascript
-const { UserLoader } = require('@coursekit/client')
-const userLoader = new UserLoader()
+const { User } = require('@coursekit/client')
+const user = new User()
 ```
 
 ### Constructor
@@ -49,7 +49,7 @@ The constructor takes one parameter:
 
 ### Methods
 
-#### `loadUser(): Promise<User>`
+#### `load(): Promise<User>`
 
 Loads the user's data from the API. The return object properties are:
 
@@ -66,7 +66,8 @@ Loads the user's data from the API. The return object properties are:
 Example:
 
 ```javascript
-const { status, user } = userLoader.loadUser()
+const { User } = require('@coursekit/client')
+const { status, user } = new User.load()
 if (status !== 200) {
   console.log(user.getName()) // null
 } else {
@@ -74,9 +75,9 @@ if (status !== 200) {
 }
 ```
 
-## User
+## User object
 
-The `User` object, returned from the `loadUser` method of `UserLoader`, provides an easy way to manage the user from the client.
+The `User` object, returned from the `load` method of `User` class, provides an easy way to manage the user from the client.
 
 ### Methods
 
@@ -143,13 +144,13 @@ Returns a number between 0 and 1 with decimal points indicating the amount of th
 
 Returns null if the user is not logged in.
 
-## LessonLoader
+## Lesson class
 
-The `LessonLoader` class is used to load lesson content.
+The `Lesson` class is used to load lesson content.
 
 ```javascript
-const { LessonLoader } = require('@coursekit/client')
-const lessonLoader = new LessonLoader(courseId, lessonId)
+const { Lesson } = require('@coursekit/client')
+const lesson = new Lesson(courseId, lessonId)
 ```
 
 ### Constructor
@@ -205,7 +206,7 @@ The return object properties are:
 Example:
 
 ```javascript
-const { status, player } = await lessonLoader.loadPlayer('#video')
+const { status, player } = await lesson.loadPlayer('#video')
 
 if (status !== 200) {
   // player === null
@@ -234,7 +235,7 @@ The `Content` object properties are:
 Example:
 
 ```javascript
-const { status, content } = await lessonLoader.loadContent()
+const { status, content } = await lesson.loadContent()
 
 if (status !== 200) {
   // content === null
@@ -243,9 +244,9 @@ if (status !== 200) {
 }
 ```
 
-## Player
+## Player object
 
-This object is returned from the `loadPlayer` method of the `LessonLoader`. The object is an instance of the [api.video PlayerSDK class](https://github.com/apivideo/api.video-player-sdk#documentation).
+This object is returned from the `loadPlayer` method of the `Lesson`. The object is an instance of the [api.video PlayerSDK class](https://github.com/apivideo/api.video-player-sdk#documentation).
 
 ### Methods and events
 
@@ -272,9 +273,8 @@ const lessonId = segments[segments.length - 1]
 This code will load the user from API and should be run ASAP.
 
 ```javascript
-const { UserLoader } = require('@coursekit/client')
-const userLoader = new UserLoader()
-const { status, user } = await userLoader.loadUser()
+const { User } = require('@coursekit/client')
+const { status, user } = await new User.load()
 ```
 
 #### Log in/out button
@@ -314,11 +314,11 @@ if (user.isAuthenticated()) {
 If you want to include private text-based content in your course you may want use a markdown string. You can load it from the API and convert to HTML using a library like [MarkdownIt](https://github.com/markdown-it/markdown-it). Once that's done you can add it to the page.
 
 ```javascript
-const { LessonLoader } = require('@coursekit/client')
+const { Lesson } = require('@coursekit/client')
 const MarkdownIt = require('markdown-it')
 
-const lessonLoader = new LessonLoader()
-const { status, content } = await lessonLoader.loadContent()
+const lesson = new Lesson()
+const { status, content } = await lesson.loadContent()
 const md = new MarkdownIt()
 
 const display = document.querySelector('#display')
