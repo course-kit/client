@@ -180,9 +180,13 @@ You will need to elect a "mount element" in your page where the player will be d
 The parameters are:
 
 - `targetSelector: string | Element` a CSS selector targeting the DOM element in which you want to create the player (eg. "#target"), or the DOM element itself
-- `opts?: object`. an object containing the player options. The available options are 
+- `opts?: object`. an object containing the player options. The available options are:
 
-...
+| Option name | Required? | Type | Description |
+|-|-|-|-|
+| autoplay | no (default: false) | boolean | start playing the video as soon as it is loaded | 
+| hideControls | no (default: false) | boolean | the controls are hidden |
+| showSubtitles | no (default: false) | boolean | the video subtitles are shown by default |
 
 The return object properties are:
 
@@ -212,7 +216,32 @@ if (status !== 200) {
 
 #### `loadContent() : Promise<Content>`
 
+Loads private content from the Lesson API.
 
+The `Content` object properties are:
+
+- `status: number`. The status of API call to load the lesson's content.
+
+| Status | Description |
+|-|-|
+| 200 | Successfully loaded |
+| 401 | User is not authenticated |
+| 403 | User is authenticated but does not have access to this lesson |
+| 500 | Error |
+
+- `content: string | null`. The content string or null if the API call was not successful.
+
+Example:
+
+```javascript
+const { status, content } = await lessonLoader.loadContent()
+
+if (status !== 200) {
+  // content === null
+} else {
+  console.log(content) // This is private lesson content!
+}
+```
 
 ## Player
 
@@ -221,10 +250,6 @@ This object is returned from the `loadPlayer` method of the `LessonLoader`. The 
 ### Methods and events
 
 Since the `Player` object is an instance of the of the api.video PlayerSDK, you should check the [documentation of the PlayerSDK methods](https://github.com/apivideo/api.video-player-sdk/blob/master/README.md#methods) for information about methods and events.
-
-## Content
-
-...
 
 ## Usage tips and examples
 
@@ -242,14 +267,14 @@ const courseId = segments[segments.length - 3]
 const lessonId = segments[segments.length - 1]
 ```
 
-### UserLoader
+### Loading user
 
 This code will load the user from API and should be run ASAP.
 
 ```javascript
 const { UserLoader } = require('@coursekit/client')
-const userLoader = new UserLoader(opts)
-const { user } = await userLoader.loadUser()
+const userLoader = new UserLoader()
+const { status, user } = await userLoader.loadUser()
 ```
 
 #### Log in/out button
@@ -284,9 +309,38 @@ if (user.isAuthenticated()) {
 }
 ```
 
-### Content
+### Loading lesson content
+
+...
+
+
+```javascript
+const { LessonLoader } = require('@coursekit/client')
+const MarkdownIt = require('markdown-it')
+
+const lessonLoader = new LessonLoader()
+const { status, content } = await lessonLoader.loadContent()
+const md = new MarkdownIt()
+
+const display = document.querySelector('#display')
+
+if (status === 200) {
+  display.innerHTML = md.render(content);
+}
+if (status === 401) {
+  display.innerHTML = 'You\'ll need to log in or enroll to access this lesson.'
+}
+if (status === 403) {
+  display.innerHTML = 'You\'ll need to enroll to access this lesson.'
+}
+if (status === 500) {
+  display.innerHTML = 'There was an error loading this lesson, try again later.'
+}
+```
 
 ### Video
+
+TBA
 
 ## Resources
 
