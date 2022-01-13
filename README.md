@@ -41,7 +41,7 @@ const userLoader = new UserLoader()
 
 The constructor takes one parameter:
 
-- `options: object`. An optional object with the following options:
+- `options?: object`. An optional object with the following options:
 
 | Option name | Required? | Type | Description |
 |-|-|-|-|
@@ -51,7 +51,28 @@ The constructor takes one parameter:
 
 #### `loadUser(): Promise<User>`
 
-Loads the user's data from the API. Returns a `User` object which provides the data and methods you need to manage the user.
+Loads the user's data from the API. The return object properties are:
+
+- `status: number`. The status of API call to load the user.
+
+| Status | Description |
+|-|-|
+| 200 | Successfully loaded |
+| 401 | User is not authenticated |
+| 500 | Error |
+
+- `user: User`. An object which provides the data and methods you need to manage the user.
+
+Example:
+
+```javascript
+const { status, user } = userLoader.loadUser()
+if (status !== 200) {
+  console.log(user.getName()) // null
+} else {
+  console.log(user.getName()) // Kilgore Trout
+}
+```
 
 ## User
 
@@ -75,6 +96,8 @@ user.login({ schoolId: 'sc8gn2pl' })
 | courseId | no | string | The ID of the course that the user should be redirected to after login.  |
 | schoolId | no | string | The ID of the school that the user should be redirected to after login.  |
 
+Will do nothing if the user is already logged in.
+
 #### `logout(opts: object): void`
 
 Logs out the user. Note that you must supply an options object with either a `courseId` value or a `schoolId` value. This value will be used to determine where the user is redirected after logout. If both values are provided, the `courseId` will be used.
@@ -84,39 +107,41 @@ Logs out the user. Note that you must supply an options object with either a `co
 | courseId | no | string | The ID of the course that the user should be redirected to after logout.  |
 | schoolId | no | string | The ID of the school that the user should be redirected to after logout.  |
 
+Will do nothing if the user is not logged in.
+
 #### `isAuthenticated(): boolean`
 
 Returns a boolean indicating whether or not the user is logged in.
 
-#### `getName(): string`
+#### `getName(): string | null`
 
-Returns the user's name as a string.
+Returns the user's name as a string or null if the user is not logged in.
 
 #### `markComplete(courseId: string, lessonId: string): Promise<boolean>`
 
-Asynchronous method that marks a specified lesson of a course as complete.
+Asynchronous method that marks a specified lesson of a course as complete. Returns a promise that resolves to a boolean indicating success. Always returns false if user is not logged in.
 
 #### `markIncomplete(courseId: string, lessonId: string): Promise<boolean>`
 
-Asynchronous method that marks a specified lesson of a course as incomplete.
+Asynchronous method that marks a specified lesson of a course as incomplete. Returns a promise that resolves to a boolean indicating success or failure. Always returns false if user is not logged in.
 
-#### `isLessonComplete(courseId: string, lessonId: string): boolean`
+#### `isLessonComplete(courseId: string, lessonId: string): boolean | null`
 
-Returns a boolean indiciating whether or not a user has marked a specified lesson of a course as complete.
+Returns a boolean indiciating whether or not a user has marked a specified lesson of a course as complete. Returns null if user is not logged in.
 
-#### `isCourseEnrolled(courseId: string): boolean`
+#### `isCourseEnrolled(courseId: string): boolean | null`
 
-Returns a boolean indicating whether or not a user is enrolled in a specified course.
+Returns a boolean indicating whether or not a user is enrolled in a specified course.  Returns null if user is not logged in.
 
-#### `getNextLessonId(courseId: string): string`
+#### `getNextLessonId(courseId: string): string | null`
 
-Returns the lesson ID of the next incomplete lesson of a specified course.
+Returns the lesson ID of the next incomplete lesson of a specified course or null if the user is not logged in.
 
-#### `getProgress(courseId: string): float`
+#### `getProgress(courseId: string): float | null`
 
-Returns a number between 0 and 1 with decimal points indicating the amount of the specified course that is complete.
+Returns a number between 0 and 1 with decimal points indicating the amount of the specified course that is complete. For example, in a 4 lesson course if 1 lesson is complete this method would return `0.25`.
 
-For example, in a 4 lesson course if 1 lesson is complete this method would return `0.25`.
+Returns null if the user is not logged in.
 
 ## LessonLoader
 
@@ -133,7 +158,7 @@ The constructor takes three parameters:
 
 - `courseId: string`. The ID of the course.
 - `lessonId: string`. The ID of the lesson.
-- `options: object`. An optional object with the following options:
+- `options?: object`. An optional object with the following options:
 
 | Option name | Required? | Type | Description |
 |-|-|-|-|
@@ -141,7 +166,7 @@ The constructor takes three parameters:
 
 ### Methods
 
-#### `loadPlayer(targetSelector: string, opts: object) : Promise<object>`
+#### `loadPlayer(targetSelector: string, opts?: object) : Promise<object>`
 
 In order to display your lesson video in your site the `loadPlayer` method will embed an HTML5 video player into your page. It also returns a `Player` object which provides method and events that allow your site to interface programmatically with the player.
 
@@ -155,12 +180,9 @@ You will need to elect a "mount element" in your page where the player will be d
 The parameters are:
 
 - `targetSelector: string | Element` a CSS selector targeting the DOM element in which you want to create the player (eg. "#target"), or the DOM element itself
-- `opts: object`. an object containing the player options. The available options are the following:
+- `opts?: object`. an object containing the player options. The available options are 
 
-| Option name | Required? | Type | Description |
-|-|-|-|-|
-| courseId | no | string | The ID of the course that the user should be redirected to after login.  |
-| schoolId | no | string | The ID of the school that the user should be redirected to after login.  |
+...
 
 The return object properties are:
 
@@ -174,7 +196,7 @@ The return object properties are:
 | 500 | Error |
 
 
-- `player: Player`. An instance of the `Player` object which provides methods and events allowing you to control the video player with JavaScript. Note that the player will be `null` if the status is not `200`.
+- `player: Player | null`. An instance of the `Player` object which provides methods and events allowing you to control the video player with JavaScript. Note that the player will be `null` if the status is not `200`.
 
 Example:
 
@@ -201,6 +223,8 @@ This object is returned from the `loadPlayer` method of the `LessonLoader`. The 
 Since the `Player` object is an instance of the of the api.video PlayerSDK, you should check the [documentation of the PlayerSDK methods](https://github.com/apivideo/api.video-player-sdk/blob/master/README.md#methods) for information about methods and events.
 
 ## Content
+
+...
 
 ## Usage tips and examples
 
