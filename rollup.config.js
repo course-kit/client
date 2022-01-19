@@ -1,5 +1,6 @@
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
+import { nodeResolve } from '@rollup/plugin-node-resolve'
+import commonjs from '@rollup/plugin-commonjs'
+import peerDepsExternal from 'rollup-plugin-peer-deps-external'
 
 export default [
   {
@@ -14,10 +15,6 @@ export default [
         file: 'dist/library.js'
       }
     ],
-    plugins: [nodeResolve(), commonjs({
-      namedExports: {
-        'player-sdk': [ 'PlayerSdk' ]
-      },
-    })]
+    plugins: [peerDepsExternal(), nodeResolve(), commonjs()]
   }
 ]
