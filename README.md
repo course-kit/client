@@ -345,4 +345,3 @@ TBA
 
 - [CourseKit](https://coursekit.dev)
 - [CourseKit Nuxt demo](https://github.com/course-kit/nuxt-demo)
-- [Getting Started guide](https://github.com/course-kit/guides/blob/master/getting-started.md)
