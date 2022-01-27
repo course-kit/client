@@ -30,7 +30,7 @@ const { CourseKitClient } = require('@coursekit/client')
 
 ## CourseKitClient class
 
-Create an instance of the client with the `new` keyword. Pass in your schoolId as an option.
+Create an instance of the client with the `new` keyword. Pass in your school ID as an option (school ID is a public value that you can find in your account dashboard).
 
 ```javascript
 import { CourseKitClient } from '@coursekit/client'
@@ -47,7 +47,7 @@ The constructor takes one parameter:
 |-|-|-|-|
 | baseUrl | no | string | Changes the URL of the CourseKit API. |
 | devMode | no | boolean | Uses development URLs for auth redirects (default: false). |
-| schoolId | **yes** | string | Sets the schoolId. |
+| schoolId | **yes** | string | Sets the school ID. |
 
 ### Methods
 
