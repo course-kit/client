@@ -14,44 +14,46 @@ NPM:
 npm install --save @coursekit/client
 ```
 
-There are two classes you can use from this library, `Lesson` and `User`. Both an ES Modules and CommonJS build are provided.
+The main API is an instance of the `CourseKitClient` class. Both an ES Modules and CommonJS build are provided.
 
 ESM:
 
 ```javascript
-import { Lesson, User } from '@coursekit/client'
+import { CourseKitClient } from '@coursekit/client'
 ```
 
 CJS:
 
 ```javascript
-const { Lesson, User } = require('@coursekit/client')
+const { CourseKitClient } = require('@coursekit/client')
 ```
 
-## User class
+## CourseKitClient class
 
-The `User` class is used to create a `User` object.
+Create an instance of the client with the `new` keyword. Pass in your schoolId as an option.
 
 ```javascript
-const { User } = require('@coursekit/client')
-const user = new User()
+import { CourseKitClient } from '@coursekit/client'
+const ck = new CourseKit({ schoolId: '...' })
 ```
 
 ### Constructor
 
 The constructor takes one parameter:
 
-- `options?: object`. An optional object with the following options:
+- `options: object`. A required object with the following options:
 
 | Option name | Required? | Type | Description |
 |-|-|-|-|
 | baseUrl | no | string | Changes the URL of the CourseKit API. |
+| devMode | no | boolean | Uses development URLs for auth redirects (default: false). |
+| schoolId | **yes** | string | Sets the schoolId. |
 
 ### Methods
 
-#### `load(): Promise<User>`
+#### `loadUser(): Promise<Response>`
 
-Loads the user's data from the API. The return object properties are:
+Loads the user's data from the API. The response object properties are:
 
 - `status: number`. The status of the API call to load the user.
 
@@ -66,8 +68,7 @@ Loads the user's data from the API. The return object properties are:
 Example:
 
 ```javascript
-const { User } = require('@coursekit/client')
-const { status, user } = new User.load()
+const { status, user } = new ck.loadUser()
 if (status !== 200) {
   console.log(user.getName()) // null
 } else {
@@ -75,38 +76,126 @@ if (status !== 200) {
 }
 ```
 
+#### `loadCourse(courseId: string) : Promise<Response>`
+
+Loads a full course from the API. Requires a `courseId`. The response object properties are:
+
+- `status: number`. The status of API call to load the lesson's content.
+
+| Status | Description |
+|-|-|
+| 200 | Successfully loaded |
+| 401 | User is not authenticated |
+| 403 | User is authenticated but does not have access to this course |
+| 404 | Course not found |
+| 500 | Error |
+
+- `course: Course | null`. The course object or `null` if the course cannot be found.
+
+Example:
+
+```javascript
+const { status, course } = await ck.loadCourse(courseId)
+if (status === 404 || status === 500) {
+  console.log(course) // null
+} else {
+  console.log(course.title) // Photography for Beginners
+}
+```
+
+#### `loadCourseSummaries() : Promise<Response>`
+
+Loads summaries of all courses of a school from the API. The response object properties are:
+
+- `status: number`. The status of API call to load the lesson's content.
+
+| Status | Description |
+|-|-|
+| 200 | Successfully loaded |
+| 401 | User is not authenticated |
+| 500 | Error |
+
+- `courses: Array<CourseSummary>`. An array of course summaries.
+
+Example:
+
+```javascript
+const { status, courses } = await ck.loadCourse(courseId)
+if (status === 401) {
+  console.log(courses[0].enrolled) // null
+} else {
+  console.log(courses[0].enrolled) // true
+}
+```
+
+#### `loadLesson(courseId: string, lessonId: string) : Promise<Response>`
+
+Loads a lesson from the API. Requires both a `courseId` and `lessonId`. The response object properties are:
+
+- `status: number`. The status of API call to load the lesson's content.
+
+| Status | Description |
+|-|-|
+| 200 | Successfully loaded |
+| 401 | User is not authenticated |
+| 403 | User is authenticated but does not have access to this lesson |
+| 404 | Lesson not found |
+| 500 | Error |
+
+- `lesson: Lesson | null`. The lesson object or `null` if the lesson cannot be found.
+
+Example:
+
+```javascript
+const { status, lesson } = await ck.loadLesson(courseId, lessonId)
+if (status === 404 || status === 500) {
+  console.log(lesson) // null
+} else {
+  console.log(lesson.title) // Welcome to the course
+}
+```
+
 ## User object
 
-The `User` object, returned from the `load` method of `User` class, provides an easy way to manage the user from the client.
+The `User` object provides an easy way to manage the user from the client.
 
 ### Methods
 
-#### `login(opts: object): void`
+#### `loginRedirect(opts?: object): void`
 
-Redirects the user to the login form. Note that you must supply an options object with either a `courseId` value or a `schoolId` value. This value will be used to determine where the user is redirected after login. If both values are provided, the `courseId` will be used.
+Redirects the user to the login form. You can supply an options object with a `courseId` value if you want the user to be redirected to a particular course after login. By default, the user will be redirected to the school URL.
+
+Also note that if the `devMode` option in the client constructor is true, the user will be redirected to the development URL of the course or school.
 
 Example:
 
 ```javascript
 // Redirects to login form then to homepage of school
-user.login({ schoolId: 'sc8gn2pl' })
+user.loginRedirect()
 ```
 
 | Option name | Required? | Type | Description |
 |-|-|-|-|
 | courseId | no | string | The ID of the course that the user should be redirected to after login.  |
-| schoolId | no | string | The ID of the school that the user should be redirected to after login.  |
 
 Will do nothing if the user is already logged in.
 
-#### `logout(opts: object): void`
+#### `logoutRedirect(opts?: object): void`
 
-Logs out the user. Note that you must supply an options object with either a `courseId` value or a `schoolId` value. This value will be used to determine where the user is redirected after logout. If both values are provided, the `courseId` will be used.
+Redirects the user to the logout page. You can supply an options object with a `courseId` value if you want the user to be redirected to a particular course after logout. By default, the user will be redirected to the school URL.
+
+Also note that if the `devMode` option in the client constructor is true, the user will be redirected to the development URL of the course or school.
+
+Example:
+
+```javascript
+// Redirects to login form then to homepage of school
+user.logoutRedirect({ courseId: 'co84mfyq' })
+```
 
 | Option name | Required? | Type | Description |
 |-|-|-|-|
 | courseId | no | string | The ID of the course that the user should be redirected to after logout.  |
-| schoolId | no | string | The ID of the school that the user should be redirected to after logout.  |
 
 Will do nothing if the user is not logged in.
 
@@ -118,139 +207,139 @@ Returns a boolean indicating whether or not the user is logged in.
 
 Returns the user's name as a string or null if the user is not logged in.
 
-#### `markComplete(courseId: string, lessonId: string): Promise<boolean>`
+## Course object
 
-Asynchronous method that marks a specified lesson of a course as complete. Returns a promise that resolves to a boolean indicating success. Always returns false if user is not logged in.
+The `Course` object provides the course data as well as meta info of the lessons of that course.
 
-#### `markIncomplete(courseId: string, lessonId: string): Promise<boolean>`
+### Properties
 
-Asynchronous method that marks a specified lesson of a course as incomplete. Returns a promise that resolves to a boolean indicating success or failure. Always returns false if user is not logged in.
+#### `id: string`
 
-#### `isLessonComplete(courseId: string, lessonId: string): boolean | null`
+Course ID.
 
-Returns a boolean indicating whether or not a user has marked a specified lesson of a course as complete. Returns null if user is not logged in.
+#### `title: string`
 
-#### `isCourseEnrolled(courseId: string): boolean | null`
+Course title.
 
-Returns a boolean indicating whether or not a user is enrolled in a specified course.  Returns null if user is not logged in.
+#### `enrolled: boolean | null`
 
-#### `getNextLessonId(courseId: string): string | null`
+The enrollment status of the course for the logged in user. Will be `null` if the user is not logged in.
 
-Returns the lesson ID of the next incomplete lesson of a specified course or null if the user is not logged in.
+#### `lessons: Array<LessonSummary>`
 
-#### `getProgress(courseId: string): float | null`
+An array of lesson summaries for this course.
+
+#### `meta: object`
+
+An object containing all meta properties of the course (these are set in the frontmatter of the course content). Will only include the *public* meta properties if the user is not logged in.
+
+#### `markdown: string | null`
+
+Raw course content. `null` is the user is not logged in.
+
+#### `html: string | null`
+
+Rendered markdown. `null` is the user is not logged in.
+
+#### `nextLessonId: string | null`
+
+Returns the lesson ID of the next incomplete lesson of a specified course or `null` if the user is not logged in.
+
+#### `progress: float | null`
 
 Returns a number between 0 and 1 with decimal points indicating the amount of the specified course that is complete. For example, in a 4 lesson course if 1 lesson is complete this method would return `0.25`.
 
-Returns null if the user is not logged in.
+Returns `null` if the user is not logged in.
 
-## Lesson class
+## LessonSummary object
 
-The `Lesson` class is used to load lesson content.
+Lesson summaries provide meta info of a lesson and are found in an array sub-property on the Course object.
 
-```javascript
-const { Lesson } = require('@coursekit/client')
-const lesson = new Lesson(courseId, lessonId)
-```
+### Properties
 
-### Constructor
+#### `id: string`
 
-The constructor takes three parameters:
+Lesson ID.
 
-- `courseId: string`. The ID of the course.
-- `lessonId: string`. The ID of the lesson.
-- `options?: object`. An optional object with the following options:
+#### `title: string`
 
-| Option name | Required? | Type | Description |
-|-|-|-|-|
-| baseUrl | no | string | Changes the URL of the CourseKit API. |
+Lesson title.
+
+#### `order: number`
+
+The order/position value of a lesson within a course.
+
+#### `complete: boolean`
+
+If the lesson is marked complete. Will be `null` if the user is not logged in.
+
+#### `meta: object`
+
+An object containing all meta properties of the lesson (these are set in the frontmatter of the lesson content). Will only include the *public* meta properties if the user is not logged in.
+
+#### `markdown: string | null`
+
+Raw lesson content. `null` is the user is not logged in.
+
+#### `html: string | null`
+
+Rendered markdown. `null` is the user is not logged in.
+
+## CourseSummary object
+
+Course summaries provide meta info of a course.
+
+### Properties
+
+#### `id: string`
+
+Course ID.
+
+#### `title: string`
+
+Course title.
+
+#### `enrolled: boolean`
+
+Indicates if the user is enrolled in the course or not. Will be `null` if the user is not logged in.
+
+#### `meta: object`
+
+An object containing any public meta properties of the course (these are set in the frontmatter of the course content).
+
+## Lesson object
+
+The `Lesson` object provides the lesson data and methods to manage the lesson.
+
+#### `id: string`
+
+Lesson ID.
+
+#### `title: string`
+
+Lesson title.
+
+#### `order: number`
+
+The order/position value of a lesson within a course.
+
+#### `complete: boolean`
+
+If the lesson is marked complete. Will be `null` if the user is not logged in.
+
+#### `meta: object`
+
+An object containing any public meta properties of the lesson (these are set in the frontmatter of the lesson content).
 
 ### Methods
 
-#### `loadPlayer(targetSelector: string, opts?: object) : Promise<object>`
+#### `markComplete(): Promise<boolean>`
 
-To display your lesson video on your site, the `loadPlayer` method will embed an HTML5 video player into your page. It also returns a `Player` object which provides methods and events that allow your site to interface programmatically with the player.
+Asynchronous method that marks a lesson as complete. Returns a promise that resolves to a boolean indicating success. Always returns false if user is not logged in.
 
-You will need to elect a "mount element" in your page where the player will be dynamically embedded. e.g.
+#### `markIncomplete(): Promise<boolean>`
 
-```html
-<!--Mount element where video player will be embedded-->
-<div id="video"></div>
-```
-
-The parameters are:
-
-- `targetSelector: string | Element` a CSS selector targeting the DOM element in which you want to create the player (eg. "#target"), or the DOM element itself
-- `opts?: object`. an object containing the player options. The available options are:
-
-| Option name | Required? | Type | Description |
-|-|-|-|-|
-| autoplay | no (default: false) | boolean | start playing the video as soon as it is loaded | 
-| hideControls | no (default: false) | boolean | the controls are hidden |
-| showSubtitles | no (default: false) | boolean | the video subtitles are shown by default |
-
-The return object properties are:
-
-- `status: number`. The status of API call to load the lesson's video.
-
-| Status | Description |
-|-|-|
-| 200 | Successfully loaded |
-| 401 | User is not authenticated |
-| 403 | User is authenticated but does not have access to this lesson |
-| 500 | Error |
-
-
-- `player: Player | null`. An instance of the `Player` object that provides methods and events allowing you to control the video player with JavaScript. Note that the player will be `null` if the status is not `200`.
-
-Example:
-
-```javascript
-const { status, player } = await lesson.loadPlayer('#video')
-
-if (status !== 200) {
-  // player === null
-} else {
-  player.addEventListener('play', console.log('Video is playing!'))
-}
-```
-
-#### `loadContent() : Promise<Content>`
-
-Loads private content from the Lesson API.
-
-The `Content` object properties are:
-
-- `status: number`. The status of API call to load the lesson's content.
-
-| Status | Description |
-|-|-|
-| 200 | Successfully loaded |
-| 401 | User is not authenticated |
-| 403 | User is authenticated but does not have access to this lesson |
-| 500 | Error |
-
-- `content: string | null`. The content string or null if the API call was not successful.
-
-Example:
-
-```javascript
-const { status, content } = await lesson.loadContent()
-
-if (status !== 200) {
-  // content === null
-} else {
-  console.log(content) // This is private lesson content!
-}
-```
-
-## Player object
-
-This object is returned from the `loadPlayer` method of the `Lesson`. The object is an instance of the [api.video PlayerSDK class](https://github.com/apivideo/api.video-player-sdk#documentation).
-
-### Methods and events
-
-Since the `Player` object is an instance of the of the api.video PlayerSDK, you should check the [documentation of the PlayerSDK methods](https://github.com/apivideo/api.video-player-sdk/blob/master/README.md#methods) for information about methods and events.
+Asynchronous method that marks a lesson as incomplete. Returns a promise that resolves to a boolean indicating success or failure. Always returns false if user is not logged in.
 
 ## Usage tips and examples
 
@@ -268,16 +357,7 @@ const courseId = segments[segments.length - 3]
 const lessonId = segments[segments.length - 1]
 ```
 
-### Loading user
-
-This code will load the user from API and should be run ASAP.
-
-```javascript
-const { User } = require('@coursekit/client')
-const { status, user } = await new User.load()
-```
-
-#### Log in/out button
+### Log in/out button
 
 Put an HTML button somewhere on your page (e.g. in the nav bar) where a user can log in or out.
 
@@ -285,14 +365,14 @@ Put an HTML button somewhere on your page (e.g. in the nav bar) where a user can
 const button = document.querySelector('#login-button')
 if (user.isAuthenticated()) {
   button.innerText = 'Log out'
-  button.addEventListener('click', user.logout({ schoolId }))
+  button.addEventListener('click', user.logoutRedirect())
 } else {
   button.innerText = 'Log in'
-  button.addEventListener('click', user.login({ schoolId }))
+  button.addEventListener('click', user.loginRedirect())
 }
 ```
 
-#### "Complete lesson and continue" button
+### "Complete lesson and continue" button
 
 On your lesson page you probably would include a button that will allow the user to simultaneously mark the current lesson complete and progress to the next one.
 
@@ -300,31 +380,33 @@ On your lesson page you probably would include a button that will allow the user
 const button = document.querySelector('#complete-button')
 if (user.isAuthenticated()) {
   button.addEventListener('click', async () => {
-    const success = await user.markComplete(courseId, lessonId)
+    const success = await lesson.markComplete()
     if (success) {
-      const nextLessonId = await user.getNextLessonId(courseId)
-      window.location.href = `/courses/${courseId}/lessons/${nextLessonId}`
+      const nextLessonId = course.nextLessonId
+      window.location.href = `/courses/${course.id}/lessons/${nextLessonId}`
     }
   })
 }
 ```
 
-### Loading lesson content
+### Utilizing response status
+
+It's a good idea to utilize the `status` property of an API call for UX.
 
 If you want to include private text-based content in your course you may want use a markdown string. You can load it from the API and convert to HTML using a library like [MarkdownIt](https://github.com/markdown-it/markdown-it). Once that's done you can add it to the page.
 
 ```javascript
-const { Lesson } = require('@coursekit/client')
-const MarkdownIt = require('markdown-it')
+const CourseKitClient = require('@coursekit/client')
+const ck = new CourseKitClient({ schoolId: 'sc123456' })
 
-const lesson = new Lesson()
-const { status, content } = await lesson.loadContent()
-const md = new MarkdownIt()
+// get courseId and lessonId from url
+const { status, lesson } = await ck.loadLesson(courseId, lessonId)
 
+// display is an element of the page where you want to render lesson
 const display = document.querySelector('#display')
 
 if (status === 200) {
-  display.innerHTML = md.render(content);
+  display.innerHTML = lesson.html;
 }
 if (status === 401) {
   display.innerHTML = 'You\'ll need to log in or enroll to access this lesson.'
@@ -336,10 +418,6 @@ if (status === 500) {
   display.innerHTML = 'There was an error loading this lesson, try again later.'
 }
 ```
-
-### Video
-
-TBA
 
 ## Resources
 
