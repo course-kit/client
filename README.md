@@ -34,7 +34,7 @@ Create an instance of the client with the `new` keyword. Pass in your school ID 
 
 ```javascript
 import { CourseKitClient } from '@coursekit/client'
-const ck = new CourseKit({ schoolId: '...' })
+const ck = new CourseKitClient({ schoolId: '...' })
 ```
 
 ### Constructor
@@ -120,7 +120,7 @@ Loads summaries of all courses of a school from the API. The response object pro
 Example:
 
 ```javascript
-const { status, courses } = await ck.loadCourse(courseId)
+const { status, courses } = await ck.loadCourseSummaries()
 if (status === 401) {
   console.log(courses[0].enrolled) // null
 } else {
