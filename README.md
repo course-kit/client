@@ -277,14 +277,6 @@ If the lesson is marked complete. Will be `null` if the user is not logged in.
 
 An object containing all meta properties of the lesson (these are set in the frontmatter of the lesson content). Will only include the *public* meta properties if the user is not logged in.
 
-#### `markdown: string | null`
-
-Raw lesson content. `null` is the user is not logged in.
-
-#### `html: string | null`
-
-Rendered markdown. `null` is the user is not logged in.
-
 ## CourseSummary object
 
 Course summaries provide meta info of a course.
