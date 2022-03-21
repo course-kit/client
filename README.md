@@ -331,6 +331,14 @@ If the lesson is marked complete. Will be `null` if the user is not logged in.
 
 An object containing any public meta properties of the lesson (these are set in the frontmatter of the lesson content).
 
+#### `markdown: string | null`
+
+Raw course content. `null` is the user is not logged in.
+
+#### `html: string | null`
+
+Rendered markdown. `null` is the user is not logged in.
+
 ### Methods
 
 #### `markComplete(): Promise<boolean>`
