@@ -235,11 +235,11 @@ An object containing all meta properties of the course (these are set in the fro
 
 #### `markdown: string | null`
 
-Raw course content. `null` if the user is not logged in.
+Raw course content. `null` if the user is not logged in and meta property of course `public.content` is not `true`.
 
 #### `html: string | null`
 
-Rendered markdown. `null` if the user is not logged in.
+Rendered markdown. `null` if the user is not logged in and meta property of course `public.content` is not `true`.
 
 #### `nextLessonId: string | null`
 
@@ -325,11 +325,11 @@ An object containing all meta properties of the lesson (these are set in the fro
 
 #### `markdown: string | null`
 
-Raw lesson content. `null` if the user is not logged in.
+Raw lesson content. `null` if the user is not logged in and meta property of lesson `public.content` is not `true`.
 
 #### `html: string | null`
 
-Rendered markdown. `null` if the user is not logged in.
+Rendered markdown. `null` if the user is not logged in and meta property of lesson `public.content` is not `true`.
 
 ### Methods
 
