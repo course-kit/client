@@ -1,7 +1,7 @@
 {
   "name": "@coursekit/client",
   "description": "CourseKit client library",
-  "version": "0.2.1",
+  "version": "0.2.2-beta.0",
   "main": "dist/library.js",
   "module": "dist/library.mjs",
   "scripts": {
